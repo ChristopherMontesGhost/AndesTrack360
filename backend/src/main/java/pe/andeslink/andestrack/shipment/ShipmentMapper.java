@@ -1,0 +1,10 @@
+package pe.andeslink.andestrack.shipment;
+import pe.andeslink.andestrack.domain.entity.*;
+import java.util.Locale;
+public final class ShipmentMapper {
+    private ShipmentMapper(){}
+    public static ShipmentView toView(Viaje t){var e=t.getEnvio();var r=e.getRuta();var c=e.getCliente().getUsuario();var d=t.getConductor().getUsuario();return new ShipmentView(ShipmentCodes.trackingCode(e.getIdEnvio()),c.getNombre(),c.getCorreo(),d.getNombre(),d.getCorreo(),t.getCamion().getPlaca(),e.getDescripcion(),r.getOrigen(),r.getDestino(),r.getDistanciaKm().doubleValue(),t.getEtaEstimada(),switch(t.getEstado()){case PROGRAMADO->"PLANNED";case EN_CURSO->"IN_TRANSIT";case DEMORADO->"DELAYED";case FINALIZADO->"DELIVERED";case CANCELADO->"CANCELLED";},t.getProgresoPct(),null,null,t.getInicioReal()==null?t.getSalidaProgramada():t.getInicioReal());}
+    public static IncidentView toIncidentView(Incidencia i){var a=i.getAlerta();boolean closed=i.getEstado()==DomainEnums.EstadoIncidencia.RESUELTA||i.getEstado()==DomainEnums.EstadoIncidencia.DESCARTADA;return new IncidentView(i.getIdIncidencia(),ShipmentCodes.trackingCode(i.getViaje().getEnvio().getIdEnvio()),i.getViaje().getCamion().getPlaca(),legacyType(i.getTipo()),a==null?"LOW":a.getSeveridad().name(),i.getDescripcion(),closed,i.getFechaHora());}
+    public static AlertView toAlertView(Alerta a){var i=a.getIncidencia();return new AlertView(a.getIdAlerta(),legacyType(i.getTipo()),a.getSeveridad().name(),i.getDescripcion(),i.getViaje().getCamion().getPlaca(),a.getFechaHora().toString(),a.getEstado()==DomainEnums.EstadoAlerta.ACTIVA,a.getFechaHora());}
+    private static String legacyType(DomainEnums.TipoIncidencia t){return switch(t){case TRAFICO_INTENSO->"TRÁFICO";case ACCIDENTE->"ACCIDENTE";case FALLA_MECANICA->"FALLA";case CLIMA_ADVERSO->"CLIMA";case BLOQUEO->"BLOQUEO";case OTRO->"OTRO";};}
+}
